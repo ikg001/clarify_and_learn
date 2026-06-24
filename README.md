@@ -1,72 +1,30 @@
-# clarify-and-learn — Claude Code Skill
+# clarify-and-learn
 
-> Kör kör koda dalmadan önce projeyi anla, gerçekten belirsiz noktalarda sor, öğrenme modunda her adımı açıkla.
-
-## Ne yapar?
-
-Bu skill, Claude Code'a iki davranış kazandırır:
-
-**1. Akıllı Soru Sorma**
-Belirsiz bir istek geldiğinde önce projeyi tarar (`package.json`, bağımlılıklar, ilgili dosyalar, git log), sonra **yalnızca taramayla çözülemeyen** noktalarda soru sorar. Taramayla anlaşılabilecek hiçbir şeyi kullanıcıya sormaz.
-
-**2. Öğrenme Modu**
-Mesajın başına `öğrenme modu:` eklenirse Claude her değişikliği gerekçesiyle açıklar:
-- Hangi dosya, hangi satır
-- Neden bu yaklaşım seçildi
-- Hangi pattern/kütüphane/API kullanıldı
+Claude Code skill — kör kör koda dalmadan önce projeyi tara, sadece gerçekten belirsiz noktalarda sor.
 
 ## Kurulum
 
-### 1. Skill dosyasını indir
-
 ```bash
-# ~/.claude/skills/ klasörüne kopyala
-mkdir -p ~/.claude/skills/clarify-and-learn
+git clone https://github.com/ikg001/clarify_and_learn.git
+cp clarify_and_learn/SKILL.md ~/.claude/skills/clarify-and-learn/SKILL.md
+
+# /cl kısayolu için
+cp clarify_and_learn/.claude/commands/cl.md ~/.claude/commands/cl.md
 ```
-
-`SKILL.md` dosyasını `~/.claude/skills/clarify-and-learn/SKILL.md` olarak kaydet.
-
-### 2. Kısayol dosyasını ekle (opsiyonel)
-
-`cl.md` dosyasını `~/.claude/skills/cl.md` olarak kaydet.
-
-Bu sayede `/cl` komutuyla skill'i hızla tetikleyebilirsin.
 
 ## Kullanım
 
 ```
-# Standart kullanım (belirsiz isteğin başında otomatik tetiklenir)
-/clarify-and-learn
-
-# Kısayol ile
-/cl bir login sayfası yap
-
-# Öğrenme modu — her değişikliği açıkla
-/cl öğrenme bir login sayfası yap
+/clarify-and-learn <istek>
+/cl <istek>
+/cl öğrenme <istek>   # her değişikliği gerekçesiyle açıklar
 ```
 
-## Örnek akış
+## Davranış
 
-```
-Sen:   /cl kullanıcı dashboarduna bildirim sistemi ekle
-
-Claude: Projeyi taradım:
-        - React + Zustand kullanılıyor
-        - Mevcut bir notification komponenti yok
-        - API'de /notifications endpoint var
-
-        Netleştirmem gereken 1 nokta:
-        1) Bildirimler real-time mi (WebSocket) yoksa polling mi?
-           a) WebSocket — anlık, ama sunucu desteği gerekir
-           b) Polling — basit, 30 sn aralıkla kontrol
-```
-
-## Dosyalar
-
-| Dosya | Açıklama |
-|-------|----------|
-| `SKILL.md` | Skill'in tam tanımı ve akış kuralları |
-| `cl.md` | `/cl` kısayolu — skill'i hızla çağırır |
+- Soru sormadan önce projeyi tarar (`package.json`, bağımlılıklar, ilgili dosyalar)
+- Yalnızca taramayla çözülemeyen noktalarda soru sorar (max 3)
+- `öğrenme` argümanıyla: her değişiklik için dosya/satır + neden + hangi pattern
 
 ## Lisans
 
