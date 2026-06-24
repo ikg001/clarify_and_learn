@@ -177,11 +177,126 @@ Claude soru sormadan önce **otomatik olarak projeyi inceler:**
 
 ### 3️⃣ Öğrenme Modu 📚
 
-`öğrenme` argümanı eklendiğinde Claude her değişikliği gerekçesiyle açıklar:
+> AI ile kod yazıyorsun ama hiçbir şey öğrenmiyorsun. 6 ay sonra kendi kodunu açıklayamıyorsun.
+> `öğrenme` argümanı bunu önler.
+
+---
+
+#### 🎬 Sahne 1 — Klasik AI Kodlama
+
+```
+ 🧑‍💻  "Auth sistemi yaz"
+
+ 🤖  [Kod gelir]
+
+     ┌─────────────────────────────────────┐
+     │  const token = await signJWT(...)   │
+     │  await redis.set(key, token, 3600)  │
+     │  return { token, refreshToken }     │
+     └─────────────────────────────────────┘
+
+ 🧑‍💻  "Çalışıyor, süper!"
+      [kodu commit'ler, bir sonraki özelliğe geçer]
+```
+
+---
+
+#### 🎬 Sahne 2 — 6 Ay Sonra
+
+```
+ 👨‍💼  "Bu auth sistemini anlatır mısın?"
+
+ 🧑‍💻  "Yani... JWT kullanıyor."
+
+ 👨‍💼  "Neden Redis'e yazıyor?"
+
+ 🧑‍💻  "Hm... token expire için mi?"
+
+ 👨‍💼  "refreshToken ne zaman kullanılıyor?"
+
+ 🧑‍💻  "..."
+
+ 👨‍💼  "Bunu sen mi yazdın?"
+
+ 🧑‍💻  "Claude yazdı."
+
+ 👨‍💼  "Peki sen ne yaptın?"
+
+ 🧑‍💻  "..."
+
+ ─────────────────────────────────────────
+  AI kullandın ama hiçbir şey öğrenmedin.
+  Kendi koduna yabancısın.
+ ─────────────────────────────────────────
+```
+
+---
+
+#### ✅ Öğrenme Moduyla Aynı Kod
+
+```
+ 🧑‍💻  "/cl öğrenme auth sistemi yaz"
+```
+
+```ts
+const token = await signJWT(payload)
+await redis.set(`session:${userId}`, token, 3600)
+return { token, refreshToken }
+```
+
+```
+ ┌──────────────────────────────────────────────────────┐
+ │  📚 Neden böyle yaptım                               │
+ ├──────────────────────────────────────────────────────┤
+ │                                                      │
+ │  auth.ts:12 — signJWT                                │
+ │  ✦ Neden: Stateless token; her istekte DB'ye         │
+ │    sorgu atmadan doğrulama yapılır                   │
+ │  ✦ Referans: RFC 7519 (JWT standartı)                │
+ │  ✦ Alternatif: Session cookie → sunucu state'i       │
+ │    gerektirir, horizontal scale'de sorun çıkarır     │
+ │                                                      │
+ │  auth.ts:13 — redis.set(..., 3600)                   │
+ │  ✦ Neden: Logout = token blacklist; JWT kendi        │
+ │    başına iptal edilemez, Redis bunu çözer           │
+ │  ✦ 3600 sn = access token ömrü (güvenlik dengesi)   │
+ │                                                      │
+ │  auth.ts:14 — refreshToken                           │
+ │  ✦ Neden: Access token kısa ömürlü tutulur;          │
+ │    kullanıcı her 1 saatte login olmak zorunda        │
+ │    kalmaz, refresh token sessioni uzatır             │
+ └──────────────────────────────────────────────────────┘
+```
+
+---
+
+#### 📈 Zamanla Fark
+
+```
+         Bilgi birikimi
+              │
+   Yüksek ████│                        ░░░░░░░░ Öğrenme Modu
+              │                   ░░░░░
+              │              ░░░░░
+              │         ░░░░░
+              │    ░░░░░
+   Düşük  ────┼────────────────────────────────────────────
+              │    ████████████████████████ Normal Mod
+              │
+              └──────────────────────────────────────────►
+            Başlangıç        3 ay         6 ay       Zaman
+
+  Normal mod: kod birikiyor, bilgi birikmiyor.
+  Öğrenme modu: ikisi birlikte büyüyor.
+```
+
+---
+
+#### ⚡ Karşılaştırma
 
 <table>
 <tr>
-<th>⚡ Normal Mod</th>
+<th>Normal Mod</th>
 <th>📚 Öğrenme Modu</th>
 </tr>
 <tr>
@@ -189,6 +304,7 @@ Claude soru sormadan önce **otomatik olarak projeyi inceler:**
 
 ```ts
 const token = await signJWT(payload)
+await redis.set(key, token, 3600)
 ```
 Bitti.
 
@@ -197,17 +313,20 @@ Bitti.
 
 ```ts
 const token = await signJWT(payload)
+await redis.set(key, token, 3600)
 ```
 
 **📚 Neden böyle yaptım**
-- `auth.ts:14` — JWT oluşturma
-- **Neden:** Stateless session; her
-  istekte DB sorgusu atmayı önler
-- **Referans:** `jsonwebtoken` / RFC 7519
-- **Alternatif:** Session cookie —
-  sunucu state'i gerektirir, seçmedik
+- Neden JWT: stateless, DB sorgusu yok
+- Neden Redis: token iptal mekanizması
+- 3600: access token ömrü, kasıtlı kısa
+- Alternatif ve neden seçilmedi
 
 </td>
+</tr>
+<tr>
+<td>6 ay sonra: "bunu kim yazdı?"</td>
+<td>6 ay sonra: her satırı açıklayabilirsin</td>
 </tr>
 </table>
 
