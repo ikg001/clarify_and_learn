@@ -14,14 +14,40 @@
 
 ## 🎯 Ne Sorun Çözüyor?
 
-Çoğu geliştirici Claude'a bir şey söyler, Claude da anında koda dalar. Belirsizlik varsa ya yanlış bir şey yazar, ya da anlamsız sorular sorar.
-
-**Bu skill ikisini de engeller.**
+### Vibe Coding Tuzağı
 
 ```
-❌ Olmadan:   "Bunu ekle" → Claude tahmin eder → Yanlış çıktı → Sen düzeltirsin
+🧑‍💻  "Şu butona tıklayınca bir şeyler olsun"
+🤖  [500 satır kod yazar]
+🧑‍💻  "Vay be, çalışıyor!"
+🧑‍💻  [3 gün sonra bir şey bozulur]
+🧑‍💻  "Neden bozuldu ki???"
+🤖  "Çünkü sen ne istediğini bilmiyordun, ben de tahmin ettim."
+```
 
-✅ Bununla:   "Bunu ekle" → Proje taranır → Net olmayan tek şey sorulur → Doğru çıktı
+> **Vibe coding** = ne yazıldığını bilmeden, "bir şekilde çalışıyor" diye ilerlemek.
+> Hızlıdır. Eğlencelidir. Ve production'da felakete davetiye çıkarır.
+
+---
+
+### Bu Skill Olmadan vs Bununla
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ❌ OLMADAN                   ✅ BU SKILL İLE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  İstek belirsiz               İstek belirsiz
+       ↓                            ↓
+  Claude tahmin eder          Proje otomatik taranır
+       ↓                            ↓
+  Yanlış yön                  Net olmayan tek nokta sorulur
+       ↓                            ↓
+  Sen düzeltirsin             Doğru çıktı, ilk seferinde
+       ↓
+  Claude tekrar yazar
+       ↓
+  Belki bu sefer doğrudur
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
 ---
@@ -33,10 +59,14 @@
 Claude soru sormadan önce **otomatik olarak projeyi inceler:**
 
 ```
-📁 Dosya yapısı          → Hangi framework, hangi mimari?
-📦 package.json / pyproject.toml  → Hangi kütüphaneler var?
-🔍 İlgili dosyalar       → İstenilen özellik nerede etkili?
-📝 Git log               → Son zamanlarda ne üzerinde çalışılmış?
+ ┌─────────────────────────────────────────────┐
+ │  🔍 OTOMATIK PROJE TARAMASI                 │
+ ├─────────────────────────────────────────────┤
+ │  📁  Dosya yapısı    →  Mimari & framework  │
+ │  📦  Bağımlılıklar   →  Hangi kütüphaneler  │
+ │  🔎  İlgili dosyalar →  Nerede değişecek    │
+ │  📝  Git log         →  Son çalışmalar      │
+ └─────────────────────────────────────────────┘
 ```
 
 > Tarama ile anlaşılabilecek hiçbir şey kullanıcıya sorulmaz.
@@ -45,14 +75,18 @@ Claude soru sormadan önce **otomatik olarak projeyi inceler:**
 
 ### 2️⃣ Sadece Gerçekten Belirsiz Olanı Sorar
 
-Tarama sonrası net olmayan sadece **iş kararları** sorulur. Maksimum 3 soru.
-
 ```
-✅ Sorar:   "Bildirimler WebSocket mi yoksa polling mi olsun?"
-✅ Sorar:   "Ücretsiz kullanıcı limiti kaç?"
-
-❌ Sormaz:  "Hangi dosyada yapayım?"    → Bulur.
-❌ Sormaz:  "React mı kullanıyorsunuz?" → Görür.
+╔══════════════════════════════════════════════╗
+║  SORAR ✅           SORMAZ ❌                ║
+╠══════════════════════════════════════════════╣
+║  "WebSocket mı,     "Hangi dosyada           ║
+║   polling mi?"       yapayım?"  → Bulur.     ║
+║                                              ║
+║  "Limit kaç         "React mı               ║
+║   olsun?"            kullanıyorsun?" → Görür ║
+╚══════════════════════════════════════════════╝
+  Max 3 soru. Tarama ile çözülebilecek
+  hiçbir şey sorulmaz.
 ```
 
 ---
@@ -63,30 +97,31 @@ Tarama sonrası net olmayan sadece **iş kararları** sorulur. Maksimum 3 soru.
 
 <table>
 <tr>
-<th>Normal Mod</th>
-<th>Öğrenme Modu</th>
+<th>⚡ Normal Mod</th>
+<th>📚 Öğrenme Modu</th>
 </tr>
 <tr>
 <td>
 
 ```ts
-// auth.ts
 const token = await signJWT(payload)
 ```
+Bitti.
 
 </td>
 <td>
 
 ```ts
-// auth.ts
 const token = await signJWT(payload)
 ```
 
-📚 **Neden böyle yaptım**
-- **Dosya:Satır** — auth.ts:14
-- **Neden** — JWT, stateless session sağlar;
-  DB'ye her istekte sorgu atmayı önler
-- **Referans** — `jsonwebtoken` / RFC 7519
+**📚 Neden böyle yaptım**
+- `auth.ts:14` — JWT oluşturma
+- **Neden:** Stateless session; her
+  istekte DB sorgusu atmayı önler
+- **Referans:** `jsonwebtoken` / RFC 7519
+- **Alternatif:** Session cookie —
+  sunucu state'i gerektirir, seçmedik
 
 </td>
 </tr>
@@ -94,37 +129,70 @@ const token = await signJWT(payload)
 
 ---
 
-## 🔄 Akış Diyagramı
+## 🔄 Nasıl Çalışır?
 
 ```
-Kullanıcı isteği geldi
-        │
-        ▼
-┌───────────────────┐
-│  Projeyi Tara     │  ← package.json, dosya yapısı, git log, ilgili dosyalar
-└────────┬──────────┘
-         │
-         ▼
-  İstek net mi?
-    /        \
-  EVET        HAYIR
-   │            │
-   │      ┌─────────────┐
-   │      │ Max 3 soru  │
-   │      │ (sadece iş  │
-   │      │  kararları) │
-   │      └──────┬──────┘
-   │             │
-   └──────┬──────┘
-          │
-          ▼
-   Öğrenme modu?
-    /          \
-  EVET          HAYIR
-   │              │
-   ▼              ▼
-Açıklamalı     Direkt
-  Kod          Çıktı
+        SEN BİR İSTEK ATIYORSUN
+                  │
+                  ▼
+    ┌─────────────────────────┐
+    │   📂 Proje Taranıyor   │
+    │   ▓▓▓▓▓▓▓▓▓▓▓ 100%    │
+    └────────────┬────────────┘
+                 │
+        ┌────────▼────────┐
+        │   Net mi?       │
+        └──┬──────────┬───┘
+           │          │
+          EVET       HAYIR
+           │          │
+           │    ┌─────▼──────────┐
+           │    │ 🙋 Max 3 soru  │
+           │    │ (sadece iş     │
+           │    │  kararları)    │
+           │    └─────┬──────────┘
+           │          │
+           └────┬─────┘
+                │
+       ┌────────▼────────┐
+       │  Öğrenme modu?  │
+       └──┬──────────┬───┘
+          │          │
+         EVET       HAYIR
+          │          │
+    ┌─────▼──┐  ┌────▼─────┐
+    │ Kodla  │  │  Kodla   │
+    │   +    │  │  direkt  │
+    │ Açıkla │  └──────────┘
+    └────────┘
+```
+
+---
+
+## 💬 Gerçek Hayat Örneği
+
+```
+╔══════════════════════════════════════════════════════╗
+║  SEN                                                 ║
+║  /cl dashboard'a bildirim sistemi ekle               ║
+╠══════════════════════════════════════════════════════╣
+║  CLAUDE                                              ║
+║  Projeyi taradım:                                    ║
+║    ✓ React + Zustand → state yönetimi belli          ║
+║    ✓ /notifications endpoint var → API hazır         ║
+║    ✗ Notification komponenti yok → sıfırdan yazacak  ║
+║                                                      ║
+║  1 nokta net değil:                                  ║
+║  Bildirimler nasıl güncellensin?                     ║
+║    a) WebSocket  → anlık, sunucu desteği gerekir     ║
+║    b) Polling    → basit, 30 sn aralıkla             ║
+╠══════════════════════════════════════════════════════╣
+║  SEN                                                 ║
+║  b                                                   ║
+╠══════════════════════════════════════════════════════╣
+║  CLAUDE                                              ║
+║  [doğrudan koda geçer — ilk seferinde doğru]         ║
+╚══════════════════════════════════════════════════════╝
 ```
 
 ---
@@ -162,31 +230,8 @@ cp clarify_and_learn/.claude/commands/cl.md ~/.claude/commands/cl.md
 # Kısayol ile
 /cl kullanıcı profil sayfası yap
 
-# Öğrenme modu — her adımı açıkla
+# Öğrenme modu — her adımı gerekçesiyle açıkla
 /cl öğrenme kullanıcı profil sayfası yap
-```
-
----
-
-## 💬 Örnek Diyalog
-
-```
-Sen:    /cl dashboard'a bildirim sistemi ekle
-
-Claude: Projeyi taradım:
-        ✓ React + Zustand kullanılıyor
-        ✓ Mevcut bir bildirim komponenti yok
-        ✓ API'de /notifications endpoint var
-
-        Netleştirmem gereken 1 nokta:
-
-        1) Bildirimler nasıl güncellensin?
-           a) WebSocket   → anlık, sunucu desteği gerekir
-           b) Polling     → basit, 30 sn aralıkla kontrol
-
-Sen:    b
-
-Claude: [doğrudan koda geçer]
 ```
 
 ---
@@ -195,10 +240,10 @@ Claude: [doğrudan koda geçer]
 
 ```
 clarify_and_learn/
-├── SKILL.md                    # Skill tanımı ve kurallar
+├── SKILL.md                 # Skill tanımı ve akış kuralları
 ├── .claude/
 │   └── commands/
-│       └── cl.md               # /cl kısayolu
+│       └── cl.md            # /cl kısayolu
 └── README.md
 ```
 
