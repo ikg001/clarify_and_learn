@@ -12,42 +12,126 @@
 
 ---
 
-## 🎯 Ne Sorun Çözüyor?
+## 💀 Vibe Coding Tuzağı
 
-### Vibe Coding Tuzağı
+> **Vibe coding** = AI'ya bir şeyler söyleyip, ne yazdığını anlamadan "çalışıyor, tamam" diye ilerlemek.
 
-```
-🧑‍💻  "Şu butona tıklayınca bir şeyler olsun"
-🤖  [500 satır kod yazar]
-🧑‍💻  "Vay be, çalışıyor!"
-🧑‍💻  [3 gün sonra bir şey bozulur]
-🧑‍💻  "Neden bozuldu ki???"
-🤖  "Çünkü sen ne istediğini bilmiyordun, ben de tahmin ettim."
-```
-
-> **Vibe coding** = ne yazıldığını bilmeden, "bir şekilde çalışıyor" diye ilerlemek.
-> Hızlıdır. Eğlencelidir. Ve production'da felakete davetiye çıkarır.
+Başta harika görünür. Sonra production yanar.
 
 ---
 
-### Bu Skill Olmadan vs Bununla
+### 🎬 Sahne 1 — Mutlu Başlangıç
 
 ```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  ❌ OLMADAN                   ✅ BU SKILL İLE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  İstek belirsiz               İstek belirsiz
-       ↓                            ↓
-  Claude tahmin eder          Proje otomatik taranır
-       ↓                            ↓
-  Yanlış yön                  Net olmayan tek nokta sorulur
-       ↓                            ↓
-  Sen düzeltirsin             Doğru çıktı, ilk seferinde
-       ↓
-  Claude tekrar yazar
-       ↓
-  Belki bu sefer doğrudur
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ Pazartesi sabahı, kahve elinde, hevesle:
+ ┌─────────────────────────────────────────────────────┐
+ │                                                     │
+ │  🧑‍💻  "Şu ödeme sayfasını yenile, daha modern olsun" │
+ │                                                     │
+ │  🤖  [Claude 400 satır kod yazar]                   │
+ │                                                     │
+ │  🧑‍💻  "Vay be, harika görünüyor!"                    │
+ │       deploy 🚀                                     │
+ │                                                     │
+ └─────────────────────────────────────────────────────┘
+```
+
+---
+
+### 🎬 Sahne 2 — Sessiz Tehlike
+
+```
+ Aynı gün, arka planda:
+
+   Kullanıcı ödeme yapıyor...
+        │
+        ▼
+   ┌──────────────────────────────────────┐
+   │  form.submit()                       │
+   │    → validation.js ← Claude burayı  │
+   │         değiştirmedi sanıyordu       │
+   │    → payment_handler.php ← ama bu   │
+   │         eski kodu bekliyor          │
+   │    → ??? ← kimse bilmiyor           │
+   └──────────────────────────────────────┘
+        │
+        ▼
+   Hata yok. Sessizce kırık.
+   Siparişler düşüyor. Kimse fark etmiyor.
+```
+
+---
+
+### 🎬 Sahne 3 — Felaket
+
+```
+ ┌─────────────────────────────────────────────────────┐
+ │                                                     │
+ │  📱 Saat 03:00 — Telefon çalıyor                    │
+ │                                                     │
+ │  😱 "Ödeme sistemi çalışmıyor, 6 saattir!"          │
+ │                                                     │
+ │  🧑‍💻  kodu açar...                                   │
+ │                                                     │
+ │       payment_handler.php:47                        │
+ │       ❓ Bu ne?                                      │
+ │       ❓ Bunu kim yazdı?                             │
+ │       ❓ Neden böyle?                                │
+ │                                                     │
+ │  🤖  "Siz istediniz, ben yazdım."                   │
+ │  🧑‍💻  "Ama ben ne istediğimi bilmiyordum ki!"        │
+ │                                                     │
+ └─────────────────────────────────────────────────────┘
+
+  Vibe coding'in faturası production'da ödenir.
+```
+
+---
+
+### ✅ Bu Skill Nasıl Çözer?
+
+```
+  SEN                 clarify-and-learn        PRODUCTION
+   │                        │                      │
+   │  "ödeme sayfasını      │                      │
+   │   yenile"              │                      │
+   │ ─────────────────────► │                      │
+   │                        │                      │
+   │                   📂 Proje taranır            │
+   │                   payment_handler.php görülür │
+   │                   validation.js bağlantısı    │
+   │                   anlaşılır                   │
+   │                        │                      │
+   │  ◄─────────────────────│                      │
+   │  "validation eski API  │                      │
+   │   bekliyor, yeni form  │                      │
+   │   bunu kırar. Uyumu    │                      │
+   │   koruyayım mı?"       │                      │
+   │                        │                      │
+   │  "evet"                │                      │
+   │ ─────────────────────► │                      │
+   │                        │ doğru, güvenli kod   │
+   │                        │ ───────────────────► │
+   │                        │                      │
+   │                        │               ✅ Çalışır
+   │                        │               03:00'de kimse
+   │                        │               aramaz
+```
+
+---
+
+### 📊 Fark Ne?
+
+```
+╔══════════════════════════════════════════════════════════╗
+║            ❌ VİBE CODİNG          ✅ BU SKİLL           ║
+╠══════════════════════════════════════════════════════════╣
+║  Claude tahmin eder          Proje önce taranır          ║
+║  Sen "çalışıyor" dersin      Belirsizlik önceden çözülür ║
+║  Gizli bağımlılıklar kırılır Bağlantılar görülür         ║
+║  Production'da patlak        İlk seferinde doğru         ║
+║  Gece 03:00 krizi            Sağlıklı uyku               ║
+╚══════════════════════════════════════════════════════════╝
 ```
 
 ---
